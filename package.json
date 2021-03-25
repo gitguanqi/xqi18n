@@ -1,0 +1,26 @@
+{
+  "name": "xqi18n",
+  "version": "0.0.1",
+  "description": "This is an international language pack based on vuejs!",
+  "main": "index.js",
+  "bin": {
+    "xqi18n": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gitguanqi/xqi18n.git"
+  },
+  "keywords": [
+    "i18n",
+    "xqi18n"
+  ],
+  "author": "gitguanqi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gitguanqi/xqi18n/issues"
+  },
+  "homepage": "https://github.com/gitguanqi/xqi18n#readme"
+}
