@@ -8,16 +8,13 @@ function xqi18n ({
     if (typeof lang != 'string') {
         throw new TypeError('Translate Warn: lang must be a string!');
     }
-    if (!messages || {}) {
-        throw new Error('Translate Warn: messages cannot be empty!');
-    }
     if (typeof messages != 'object') {
         throw new TypeError('Translate Warn: messages must be a object!');
     }
 
     this.lang = lang;
     this.messages = messages;
-    this.tns = function (key) {
+    this.tns = (key) => {
         return this.translateFn(key);
     };
 }
@@ -49,4 +46,4 @@ xqi18n.prototype.translateFn = function (key) {
     return result;
 }
 
-module.exports = xqi18n;
+export default xqi18n;
