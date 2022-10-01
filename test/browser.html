@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xqi18n browser test</title>
+</head>
+
+<body>
+    <h3>xqi18n browser test</h3>
+    <script src="../lib/xqi18n.js"></script>
+    <script>
+        const xqi18 = new xqi18n({
+            lang: 'zhCn',
+            messages: {
+                zhCn: {
+                    name: '快乐'
+                },
+                zhHk: {
+                    name: '快樂'
+                },
+                enUs: {
+                    name: 'happy',
+                }
+            },
+        });
+
+        console.log('xqi18 is:', xqi18);
+
+        /*
+        xqi18 is: xqi18n {
+            lang: 'zhCn',
+            messages: {
+            zhCn: { name: '快乐' },
+            zhHk: { name: '快樂' },
+            enUs: { name: 'happy' }
+            },
+            tns: [Function (anonymous)]
+        }
+        */
+
+        const textCn = xqi18.tns('name');
+        console.log('text zhCN is:', textCn); // text zhCN is: 快乐
+    </script>
+</body>
+
+</html>

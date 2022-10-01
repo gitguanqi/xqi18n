@@ -1,3 +1,3 @@
-import xqI18n from './bin/index'
+const xqI18n = require('./lib/xqi18n');
 
-export default xqI18n;
+module.exports = xqI18n;

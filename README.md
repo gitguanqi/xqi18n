@@ -10,11 +10,11 @@
 npm install xqi18n --save
 ```
 
-### create 
+### create
 
 Create a new folder `locale`
 
-```
+```sh
 + locale
   - config
     - zhCn.js

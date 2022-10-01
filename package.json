@@ -1,13 +1,15 @@
 {
   "name": "xqi18n",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "This is an international language pack based on vuejs!",
   "main": "index.js",
   "bin": {
     "xqi18n": "index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:node": "node test/node.js",
+    "test:browser": "live-server --port=4001 --host=localhost"
   },
   "repository": {
     "type": "git",
