@@ -3,48 +3,95 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>xqi18n esm test</title>
+    <title>xqi18n ESM test</title>
+    <link rel="icon" href="./test-icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./demo.css">
 </head>
 
 <body>
-    <h3>xqi18n esm test</h3>
+    <header class="test-header">
+        <div class="test-brand">
+            <img class="test-brand-icon" src="./test-icon.svg" alt="" width="20" height="20">
+            xqi18n <span>test pages</span>
+        </div>
+        <nav class="test-nav" aria-label="Test pages">
+            <a href="./index.html">Index</a>
+            <a href="./browser.html">Browser</a>
+            <a href="./esm.html" aria-current="page">ESM</a>
+            <a href="./vue2.html">Vue 2</a>
+            <a href="./vue3.html">Vue 3</a>
+        </nav>
+    </header>
+
+    <main class="test-main">
+        <section class="panel">
+            <h1>ESM build</h1>
+            <p class="test-lead">
+                Imports <code>../lib/xqi18n-esm.min.js</code> with
+                <code>&lt;script type="module"&gt;</code> and checks that the default and named
+                exports are the same constructor.
+            </p>
+            <div id="summary" class="status-badge is-running" aria-live="polite">RUNNING</div>
+            <ul id="checks" class="check-list"></ul>
+            <p id="details" class="test-details"></p>
+        </section>
+
+        <section class="panel">
+            <h2>Live demo</h2>
+            <p class="test-lead">Same behaviour through the module build.</p>
+            <div class="demo-panel">
+                <p class="demo-line"><span>name</span><strong id="demo-name"></strong></p>
+                <p class="demo-line"><span>a.b.f.g.h (nested)</span><strong id="demo-nested"></strong></p>
+                <p class="demo-line"><span>missing.key</span><strong id="demo-missing"></strong></p>
+            </div>
+            <div class="demo-controls">
+                <button type="button" data-lang="zhCn">中文</button>
+                <button type="button" data-lang="enUs">English</button>
+                <button type="button" data-lang="frFr">Unknown language</button>
+            </div>
+        </section>
+    </main>
+
     <script type="module">
-        import xqi18n from '../lib/xqi18n-esm.min.js';
+        import Xqi18n, { xqi18n as Named, Xqi18n as Canonical } from '../lib/xqi18n-esm.min.js';
+        import { createCheckRunner, assert } from './checks.js';
+        import { messages } from './fixtures.mjs';
+        import { createChecks } from './shared-suite.mjs';
 
-        const xqi18 = new xqi18n({
-            lang: 'zhCn',
-            messages: {
-                zhCn: {
-                    name: '快乐'
-                },
-                zhHk: {
-                    name: '快樂'
-                },
-                enUs: {
-                    name: 'happy',
-                }
-            },
-        });
+        const runner = createCheckRunner({ page: 'esm' });
 
-        console.log('xqi18 is:', xqi18);
+        const checks = [
+            ['default export is the constructor', () => {
+                assert(typeof Xqi18n === 'function', 'the default export is not a function');
+            }],
+            ['default and named exports agree', () => {
+                assert(Xqi18n === Named, 'default !== { xqi18n }');
+                assert(Xqi18n === Canonical, 'default !== { Xqi18n }');
+            }],
+            ['the module build creates no global', () => {
+                assert(window.xqi18n === undefined, 'the esm build polluted window.xqi18n');
+            }],
+            ...createChecks(Xqi18n),
+        ];
 
-        /*
-        xqi18 is: xqi18n {
-            lang: 'zhCn',
-            messages: {
-            zhCn: { name: '快乐' },
-            zhHk: { name: '快樂' },
-            enUs: { name: 'happy' }
-            },
-            tns: [Function (anonymous)]
+        await runner.run(checks);
+
+        const i18n = new Xqi18n({ lang: 'zhCn', messages });
+        const render = () => {
+            document.querySelector('#demo-name').textContent = i18n.tns('name');
+            document.querySelector('#demo-nested').textContent = i18n.tns('a.b.f.g.h');
+            document.querySelector('#demo-missing').textContent = i18n.tns('missing.key');
+        };
+        render();
+        for (const button of document.querySelectorAll('[data-lang]')) {
+            button.addEventListener('click', () => {
+                i18n.lang = button.dataset.lang;
+                render();
+            });
         }
-        */
-
-        const textCn = xqi18.tns('name');
-        console.log('text zhCN is:', textCn); // text zhCN is: 快乐
-
+        document.documentElement.dataset.xqi18nModule = 'ready';
+        runner.markDemoReady();
     </script>
 </body>
 

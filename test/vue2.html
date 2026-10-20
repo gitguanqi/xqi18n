@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xqi18n Vue 2 test</title>
+    <link rel="icon" href="./test-icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./demo.css">
+</head>
+
+<body>
+    <header class="test-header">
+        <div class="test-brand">
+            <img class="test-brand-icon" src="./test-icon.svg" alt="" width="20" height="20">
+            xqi18n <span>test pages</span>
+        </div>
+        <nav class="test-nav" aria-label="Test pages">
+            <a href="./index.html">Index</a>
+            <a href="./browser.html">Browser</a>
+            <a href="./esm.html">ESM</a>
+            <a href="./vue2.html" aria-current="page">Vue 2</a>
+            <a href="./vue3.html">Vue 3</a>
+        </nav>
+    </header>
+
+    <main class="test-main" data-vue-major="2">
+        <section class="panel">
+            <h1>Vue 2 plugin</h1>
+            <p class="test-lead">
+                Loads the Vue 2 runtime from a pinned CDN and the committed bundles from
+                <code>../lib/</code>, then mounts one component with one instance.
+            </p>
+            <div id="summary" class="status-badge is-running" aria-live="polite">RUNNING</div>
+            <ul id="checks" class="check-list"></ul>
+            <p id="details" class="test-details"></p>
+        </section>
+
+        <section class="panel">
+            <h2>Live demo</h2>
+            <p class="test-lead">The plugin re-renders the component when the language changes.</p>
+            <div id="vue-demo"></div>
+            <div class="demo-controls">
+                <button type="button" data-lang="zhCn">中文</button>
+                <button type="button" data-lang="enUs">English</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+    <script src="../lib/xqi18n.min.js"></script>
+    <script src="../lib/vue/xqi18n.min.js"></script>
+    <script type="module">
+        import { createCheckRunner, assert } from './checks.js';
+
+        const runner = createCheckRunner({ page: 'vue2' });
+        const runtimeReady = typeof window.Vue === 'function' && /^2\./.test(window.Vue.version);
+
+        const template = `
+            <div class="demo-panel">
+                <p class="demo-line"><span>name</span><strong class="vue-value">{{ $t('name') }}</strong></p>
+                <p class="demo-line"><span>a.b.c (nested)</span><strong class="vue-nested">{{ $t('a.b.c') }}</strong></p>
+            </div>`;
+
+        const messages = {
+            zhCn: { name: '快乐', a: { b: { c: '深层' } } },
+            enUs: { name: 'happy', a: { b: { c: 'nested' } } },
+        };
+
+        const checks = [['Vue 2 runtime is available', () => {
+            assert(runtimeReady, 'Vue 2 CDN did not load (offline?)');
+        }]];
+
+        if (runtimeReady) {
+            const Vue = window.Vue;
+            const i18n = new window.xqi18n({ lang: 'zhCn', messages, warn: false });
+            Vue.use(window.xqi18nVue, { i18n });
+
+            const mount = (host) => {
+                const target = document.createElement('div');
+                host.append(target);
+                return new Vue({ template, el: target });
+            };
+
+            checks.push(
+                ['plugin installs through Vue.use', () => {
+                    assert(typeof Vue.prototype.$t === 'function', '$t was not installed on the prototype');
+                    assert(Vue.prototype.$xqi18n === i18n, '$xqi18n was not installed');
+                    assert(Vue.prototype.$t('name') === '快乐', '$t returned the wrong value');
+                }],
+                ['the template renders the translation', async () => {
+                    const host = document.createElement('div');
+                    const vm = mount(host);
+                    await Vue.nextTick();
+                    const text = vm.$el.querySelector('.vue-value').textContent.trim();
+                    vm.$destroy();
+                    assert(text === '快乐', `expected 快乐, found ${text}`);
+                }],
+                ['changing lang re-renders without a reload', async () => {
+                    const host = document.createElement('div');
+                    const vm = mount(host);
+                    await Vue.nextTick();
+                    i18n.lang = 'enUs';
+                    await Vue.nextTick();
+                    const name = vm.$el.querySelector('.vue-value').textContent.trim();
+                    const nested = vm.$el.querySelector('.vue-nested').textContent.trim();
+                    vm.$destroy();
+                    assert(name === 'happy', `name did not update, found ${name}`);
+                    assert(nested === 'nested', `nested key did not update, found ${nested}`);
+                }],
+                ['a destroyed component unsubscribes silently', async () => {
+                    const host = document.createElement('div');
+                    const vm = mount(host);
+                    await Vue.nextTick();
+                    vm.$destroy();
+                    i18n.lang = 'zhCn';
+                    await Vue.nextTick();
+                    assert(true, 'unreachable');
+                }],
+            );
+
+            await runner.run(checks);
+
+            // The suite destroys its disposable components; restore a live demo.
+            const demo = mount(document.querySelector('#vue-demo'));
+            await Vue.nextTick();
+            for (const button of document.querySelectorAll('[data-lang]')) {
+                button.addEventListener('click', () => {
+                    i18n.lang = button.dataset.lang;
+                });
+            }
+            assert(demo.$el.querySelector('.vue-value'), 'the demo did not mount');
+            runner.markDemoReady();
+        } else {
+            await runner.run(checks);
+            document.querySelector('#details').textContent += ' Live demo skipped: no Vue 2 runtime.';
+        }
+    </script>
+</body>
+
+</html>

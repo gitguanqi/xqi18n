@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xqi18n test pages</title>
+    <link rel="icon" href="./test-icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./demo.css">
+</head>
+
+<body>
+    <header class="test-header">
+        <div class="test-brand">
+            <img class="test-brand-icon" src="./test-icon.svg" alt="" width="20" height="20">
+            xqi18n <span>test pages</span>
+        </div>
+        <nav class="test-nav" aria-label="Test pages">
+            <a href="./index.html" aria-current="page">Index</a>
+            <a href="./browser.html">Browser</a>
+            <a href="./esm.html">ESM</a>
+            <a href="./vue2.html">Vue 2</a>
+            <a href="./vue3.html">Vue 3</a>
+        </nav>
+    </header>
+
+    <main class="test-main">
+        <section class="panel">
+            <h1>Standalone checks</h1>
+            <p class="test-lead">
+                Every page loads the committed bundles by relative path and reports
+                <strong>PENDING / PASS / FAIL</strong> next to each check. Start the server with
+                <code>npm run test:browser</code>; the pages need HTTP so that
+                <code>&lt;script type="module"&gt;</code> can resolve.
+            </p>
+
+            <div class="test-links">
+                <div class="test-link-row">
+                    <div>
+                        <strong>Browser (UMD)</strong>
+                        <em>Classic script, global <code>xqi18n</code>, full behaviour suite.</em>
+                    </div>
+                    <a class="test-link-button" href="./browser.html">Open</a>
+                </div>
+                <div class="test-link-row">
+                    <div>
+                        <strong>ESM</strong>
+                        <em>Module build, default and named exports, same behaviour suite.</em>
+                    </div>
+                    <a class="test-link-button" href="./esm.html">Open</a>
+                </div>
+                <div class="test-link-row">
+                    <div>
+                        <strong>Vue 2</strong>
+                        <em><code>Vue.use()</code>, <code>$t</code> in a template, re-render on switch.</em>
+                    </div>
+                    <a class="test-link-button" href="./vue2.html">Open</a>
+                </div>
+                <div class="test-link-row">
+                    <div>
+                        <strong>Vue 3</strong>
+                        <em><code>app.use()</code>, <code>inject('xqi18n')</code>, re-render on switch.</em>
+                    </div>
+                    <a class="test-link-button" href="./vue3.html">Open</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Notes</h2>
+            <p class="test-lead">
+                The Vue pages fetch their runtime from a pinned CDN, so they report a single failure
+                instead of hanging when the network is unavailable. Core behaviour is fully covered by
+                the Browser and ESM pages, which use only files from this repository.
+            </p>
+        </section>
+    </main>
+</body>
+
+</html>

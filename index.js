@@ -1,3 +1,1 @@
-const xqI18n = require('./lib/xqi18n');
-
-module.exports = xqI18n;
+module.exports = require('./lib/xqi18n.js');

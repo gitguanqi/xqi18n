@@ -1,15 +1,50 @@
 {
   "name": "xqi18n",
-  "version": "0.0.3",
-  "description": "This is an international language pack based on vuejs!",
+  "version": "0.1.0",
+  "description": "A tiny dependency-free i18n helper with nested keys and a Vue 2/3 plugin.",
   "main": "index.js",
-  "bin": {
-    "xqi18n": "index.js"
+  "module": "lib/xqi18n-esm.mjs",
+  "browser": "lib/xqi18n.min.js",
+  "unpkg": "lib/xqi18n.min.js",
+  "jsdelivr": "lib/xqi18n.min.js",
+  "types": "lib/types/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "index.js",
+    "lib",
+    "README.md",
+    "zh.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/xqi18n-esm.mjs",
+      "require": "./lib/xqi18n.js",
+      "default": "./lib/xqi18n.js"
+    },
+    "./vue": {
+      "types": "./lib/types/vue/index.d.ts",
+      "import": "./lib/vue/xqi18n.mjs",
+      "require": "./lib/vue/xqi18n.js",
+      "default": "./lib/vue/xqi18n.js"
+    },
+    "./lib/*": "./lib/*",
+    "./index.js": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node scripts/build.mjs",
+    "typecheck": "node scripts/typecheck.mjs",
+    "pretest": "node scripts/build.mjs",
+    "test": "node --test test/core.test.mjs test/bundles.test.mjs test/umd.test.mjs test/exports.test.mjs test/vue.test.mjs test/readme.test.mjs test/package.test.mjs test/pages.test.mjs test/server.test.mjs",
     "test:node": "node test/node.js",
-    "test:browser": "live-server --port=4001 --host=localhost"
+    "test:browser": "node scripts/serve.mjs",
+    "prepublishOnly": "node scripts/build.mjs",
+    "verify": "npm run typecheck && npm test"
   },
   "repository": {
     "type": "git",
@@ -17,6 +52,11 @@
   },
   "keywords": [
     "i18n",
+    "internationalization",
+    "translation",
+    "vue",
+    "vue2",
+    "vue3",
     "xqi18n"
   ],
   "author": "gitguanqi",
@@ -24,5 +64,12 @@
   "bugs": {
     "url": "https://github.com/gitguanqi/xqi18n/issues"
   },
-  "homepage": "https://github.com/gitguanqi/xqi18n#readme"
+  "homepage": "https://github.com/gitguanqi/xqi18n#readme",
+  "engines": {
+    "node": ">=14"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
 }
