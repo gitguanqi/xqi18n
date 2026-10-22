@@ -266,6 +266,21 @@ treated as missing.
 | The `bin` entry was removed | `npx xqi18n` never worked; use the API |
 | Deep paths are now declared in `exports` | Keep the `.js` extension: `xqi18n/lib/xqi18n.min.js` |
 
+## For AI agents
+
+The package ships machine-readable integration notes, declared in `package.json`:
+
+- [`llms.txt`](./llms.txt) — the compact public API: exports, options, defaults,
+  error strings, one runnable example, and the constraints that are easy to get
+  wrong.
+- [`skills/xqi18n-integration/SKILL.md`](./skills/xqi18n-integration/SKILL.md) —
+  when to load the package, which entry to pick, the order to wire the Vue
+  plugin in, and how to verify a language switch. Exact signatures live in
+  [`references/api.md`](./skills/xqi18n-integration/references/api.md).
+
+Both files are plain markdown and ship in the tarball, so an agent reading the
+installed package can find them without network access.
+
 ## Development
 
 ```sh

@@ -1,6 +1,6 @@
 {
   "name": "xqi18n",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A tiny dependency-free i18n helper with nested keys and a Vue 2/3 plugin.",
   "main": "index.js",
   "module": "lib/xqi18n-esm.mjs",
@@ -8,12 +8,16 @@
   "unpkg": "lib/xqi18n.min.js",
   "jsdelivr": "lib/xqi18n.min.js",
   "types": "lib/types/index.d.ts",
+  "llms": "./llms.txt",
+  "agents": "./skills/xqi18n-integration/SKILL.md",
   "sideEffects": false,
   "files": [
     "index.js",
     "lib",
     "README.md",
-    "zh.md"
+    "zh.md",
+    "llms.txt",
+    "skills"
   ],
   "exports": {
     ".": {
@@ -40,11 +44,13 @@
     "build": "node scripts/build.mjs",
     "typecheck": "node scripts/typecheck.mjs",
     "pretest": "node scripts/build.mjs",
-    "test": "node --test test/core.test.mjs test/bundles.test.mjs test/umd.test.mjs test/exports.test.mjs test/vue.test.mjs test/readme.test.mjs test/package.test.mjs test/pages.test.mjs test/server.test.mjs",
+    "test": "node --test test/core.test.mjs test/bundles.test.mjs test/umd.test.mjs test/exports.test.mjs test/vue.test.mjs test/readme.test.mjs test/package.test.mjs test/pages.test.mjs test/server.test.mjs test/agents.test.mjs",
     "test:node": "node test/node.js",
     "test:browser": "node scripts/serve.mjs",
     "prepublishOnly": "node scripts/build.mjs",
-    "verify": "npm run typecheck && npm test"
+    "verify": "npm run typecheck && npm test",
+    "commitlint": "commitlint --edit",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -69,7 +75,11 @@
     "node": ">=14"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "esbuild": "^0.28.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
     "typescript": "^7.0.2"
   }
 }

@@ -88,7 +88,7 @@ test('build tooling is declared', () => {
 
 test('the package is publishable', () => {
   assert.equal(pkg.name, 'xqi18n');
-  assert.equal(pkg.version, '0.1.0');
+  assert.equal(pkg.version, '0.2.0');
   assert.equal(pkg.license, 'MIT');
   assert.equal(pkg.private, undefined, 'a private package cannot be published');
   assert.ok(pkg.description.length > 10);

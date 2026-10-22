@@ -259,6 +259,16 @@ declare module '@vue/runtime-core' {
 | 删除了 `bin` 声明 | `npx xqi18n` 从来不可用，请直接调用 API |
 | 深路径改由 `exports` 声明 | 请带扩展名：`xqi18n/lib/xqi18n.min.js` |
 
+## 给 AI 智能体
+
+包内附带了机器可读的接入说明，并在 `package.json` 中声明：
+
+- [`llms.txt`](./llms.txt) —— 精简的公开 API：导出、参数、默认值、错误文案、一个可运行示例，以及容易踩坑的约束。
+- [`skills/xqi18n-integration/SKILL.md`](./skills/xqi18n-integration/SKILL.md) —— 什么场景该加载本包、选哪个入口、Vue 插件的注册顺序、以及如何验证语言切换。完整的签名与错误表在
+  [`references/api.md`](./skills/xqi18n-integration/references/api.md)。
+
+这两个文件都是普通 markdown，且会随 tarball 一起发布，因此智能体读取已安装的包即可找到，无需联网。
+
 ## 开发
 
 ```sh

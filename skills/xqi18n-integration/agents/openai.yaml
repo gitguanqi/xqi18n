@@ -1,0 +1,5 @@
+interface:
+  display_name: "xqi18n Integration"
+  short_description: "Wire xqi18n into browser, Node, and Vue apps"
+  brand_color: "#0B7285"
+  default_prompt: "Use $xqi18n-integration to wire xqi18n into this project, choosing the right entry, ordering the plugin install, and verifying language switching."

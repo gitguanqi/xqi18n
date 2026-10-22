@@ -1,0 +1,142 @@
+# xqi18n
+
+A tiny, dependency-free i18n helper for browsers and Node.js (>= 14): dot-path
+nested keys, runtime language switching, and an optional Vue 2 / Vue 3 plugin.
+The core has no reactivity; nothing re-renders on its own unless the Vue plugin
+is installed.
+
+## Install
+
+```sh
+npm install xqi18n
+```
+
+Vue projects additionally need their own `vue` install — xqi18n never depends on it:
+
+```sh
+npm install xqi18n vue
+```
+
+## Imports
+
+```js
+// ESM
+import xqi18n, { Xqi18n } from 'xqi18n';
+import xqi18nVue, { createXqi18nVuePlugin } from 'xqi18n/vue';
+
+// CommonJS — the entry is the constructor itself, not a { default } wrapper
+const xqi18n = require('xqi18n');
+const xqi18nVue = require('xqi18n/vue');
+```
+
+The default export and the named `Xqi18n` / `xqi18n` exports are the same class.
+
+## Exported API
+
+- `new xqi18n(options): Xqi18n`
+  Validates options in the constructor and throws on bad input. One instance per
+  app is the intended usage; share it rather than building one per component.
+- `i18n.tns<T = string>(key: string): T`
+  Translate in the current language. Created in the constructor as an own,
+  bound property, so `const t = i18n.tns` and `Vue.prototype.$tns = i18n.tns`
+  keep working after being detached.
+- `i18n.translateFn<T = string>(key: string): T`
+  The same lookup without the binding. Throws synchronously on an empty key or
+  a non-string key.
+- `i18n.lang: string` — accessor. Reading returns the current code; assigning
+  switches language, notifies subscribers, and is a no-op for the same value.
+- `i18n.messages: Messages` — the object you passed in, held by reference.
+- `i18n.strict` / `i18n.warn: boolean` — writable at runtime.
+- `i18n.subscribe(fn: (lang: string) => void): () => void`
+  Returns an idempotent unsubscribe function. A listener that throws is caught
+  and logged; the others still run.
+- `i18n.toJSON(): { lang, messages }`
+  Keeps `JSON.stringify(i18n)` output identical to the pre-0.1 shape.
+- `xqi18n/vue` default export — a plugin object with `install(target, options?)`.
+  It also carries `createXqi18nVuePlugin`, because the UMD bundle exposes only
+  the default export.
+- `createXqi18nVuePlugin(i18n): { install }`
+  Named export of `xqi18n/vue`; binds the instance up front instead of passing
+  it to `use()`.
+
+Types (declaration-only, import with `import type`):
+`MessageTree`, `Messages`, `Xqi18nOptions`, `Xqi18nListener`,
+`Xqi18nGlobalProperties`, `Xqi18nVueOptions`, `Xqi18nVuePlugin`,
+`VueComponentLike`, `VueLikeTarget`.
+
+## Key Options
+
+- `lang` (required): non-empty string. Must match a key of `messages`, but a
+  missing language is not an error — every key just resolves as missing.
+- `messages` (required): plain object of message trees keyed by language code.
+  Leaves may be any value, including `0`, `false`, and `''`.
+- `strict` (default `false`): throw `TypeError('Translate Warn: key does not
+  exist!')` on a missing key instead of returning the key.
+- `warn` (default `true`): set to `false` to silence the missing-key console
+  warning, which is already rate-limited to once per language and key.
+
+## Typical Use
+
+```js
+import xqi18n from 'xqi18n';
+
+const i18n = new xqi18n({
+    lang: localStorage.getItem('locale') || 'zhCn',
+    messages: {
+        zhCn: { name: '快乐', nav: { home: '首页' } },
+        enUs: { name: 'happy', nav: { home: 'Home' } }
+    }
+});
+
+i18n.tns('name');        // '快乐'
+i18n.tns('nav.home');    // '首页'
+
+const off = i18n.subscribe((lang) => {
+    document.documentElement.lang = lang;
+});
+
+i18n.lang = 'enUs';      // subscribers fire, no reload
+i18n.tns('nav.home');    // 'Home'
+off();
+```
+
+Vue 3:
+
+```js
+import { createApp } from 'vue';
+import xqi18n from 'xqi18n';
+import xqi18nVue from 'xqi18n/vue';
+
+const i18n = new xqi18n({ lang: 'zhCn', messages: { zhCn: { name: '快乐' } } });
+
+createApp(App).use(xqi18nVue, { i18n }).mount('#app');
+// template: {{ $t('name') }} / this.$tns('name') / inject('xqi18n')
+```
+
+Vue 2 is the same call with `Vue.use(xqi18nVue, { i18n })` before the root
+instance is created.
+
+## Constraints
+
+- The Vue plugin needs the instance: `app.use(plugin, { i18n })`. Calling
+  `app.use(plugin)` alone throws a `TypeError`; use `createXqi18nVuePlugin(i18n)`
+  when the plugin object is registered without options.
+- Install the plugin before mounting the root component, or the earliest
+  `created` hooks will not see `$t`.
+- Language switching is coarse: the plugin registers one global mixin, so every
+  component re-renders via `$forceUpdate()`. That is intentional, not a leak.
+  Under SSR `$forceUpdate` does not exist and is skipped.
+- Installing the same plugin on the same target with the same instance twice is
+  a no-op (tracked in a `WeakMap`); a different instance re-registers globals.
+- Key lookup walks own properties only — `constructor`, `__proto__`, and
+  `prototype` never resolve to prototype members.
+- A missing key returns the key string itself, so one typo cannot crash a
+  render; set `strict: true` if you need the throw for tests or CI.
+- The package deliberately has no `"type": "module"`, so `require('xqi18n')`
+  keeps returning the constructor. Deep paths need an extension:
+  `xqi18n/lib/xqi18n.min.js`.
+- CDN builds expose globals: `window.xqi18n` (core) and `window.xqi18nVue`
+  (plugin). `https://unpkg.com/xqi18n` and `https://cdn.jsdelivr.net/npm/xqi18n`
+  both resolve to `lib/xqi18n.min.js`.
+- No interpolation, pluralization, or locale fallback chain. Compose strings at
+  the call site and keep one message tree per language.
